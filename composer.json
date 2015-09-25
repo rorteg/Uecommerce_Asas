@@ -1,0 +1,34 @@
+{
+    "name": "uecommerce/asaas",
+    "description": "Asaas Boleto generate PHP Library",
+    "keywords": ["Assas", "gateway", "pagamento"],
+    "homepage": "http://uecommerce.com.br",
+    "license": "MIT",
+    "version":"1.0.0",
+    "authors": [
+        {
+            "name":"Rafael Ortega Bueno",
+            "email":"rafael@uecommerce.com.br",
+            "homepage":"http://uecommerce.com.br",
+            "role":"Develop"
+        },
+        {
+            "name":"Jonathan Ribas",
+            "email":"jonathan@uecommerce.com.br",
+            "homepage":"http://uecommerce.com.br",
+            "role":"Developer"
+        }
+    ],
+    "autoload": {
+        "psr-4": { "Uecommerce\\" : "src/Uecommerce" }
+    },
+    "require": {
+        "php": ">=5.4",
+        "ext-curl": "*",
+        "ext-json": "*"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "~4.0",
+        "satooshi/php-coveralls": "dev-master"
+    }
+}

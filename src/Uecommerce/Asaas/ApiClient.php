@@ -56,6 +56,24 @@ class ApiClient extends AsaasAbstract
     protected $method = 'POST';
 
     /**
+     *
+     * @var array
+     */
+    protected $filters = array();
+    
+    /**
+     *
+     * @var int
+     */
+    protected $limit = false;
+    
+    /**
+     *
+     * @var int
+     */
+    protected $offset = false;
+
+    /**
      * 
      * @param string $apikey
      */
@@ -84,10 +102,18 @@ class ApiClient extends AsaasAbstract
     public function getApiUrl()
     {
         $id = ($this->request->id) ? $this->request->id : '';
-        $urlAdditional = (method_exists($this->request, 'getAdditionalUri')) ? '/' . $this->request->getAdditionalUri() : '';
-        return parent::getApiUrl() . $this->request->getUri() . '/' . $id . $urlAdditional;
+        if (method_exists($this->request, 'getCustomUri')) {
+            if ($this->request->getCustomUri()) {
+                return parent::getApiUrl() . $this->request->getCustomUri();
+            }
+        }
+        return parent::getApiUrl() . $this->request->getUri(). '/' . $id . $this->getFilters();
     }
 
+    /**
+     * 
+     * @return Uecommerce\Asaas\Response\Response
+     */
     public function create()
     {
         $this->method = 'POST';
@@ -95,36 +121,64 @@ class ApiClient extends AsaasAbstract
         return $this->getResponse();
     }
 
-    public function get()
+    /**
+     * 
+     * @return Uecommerce\Asaas\Response\Response
+     * @throws Exception
+     */
+    public function get($id = false)
     {
-        if (!$this->request->id) {
-            throw new Exception('Id not found');
+        if (!$this->request->id && !$id) {
+            throw new \Exception('Id not found');
+        }
+        if ($id) {
+            $this->request->id = $id;
         }
         $this->method = 'GET';
         $this->sendRequest();
         return $this->getResponse();
     }
 
-    public function update()
+    /**
+     * 
+     * @return Uecommerce\Asaas\Response\Response
+     * @throws Exception
+     */
+    public function update($id = false)
     {
-        if (!$this->request->id) {
-            throw new Exception('Id not found');
+        if (!$this->request->id && !$id) {
+            throw new \Exception('Id not found');
+        }
+        if ($id) {
+            $this->request->id = $id;
         }
         $this->method = 'POST';
         $this->sendRequest();
         return $this->getResponse();
     }
 
-    public function delete()
+    /**
+     * 
+     * @return Uecommerce\Asaas\Response\Response
+     * @throws Exception
+     */
+    public function delete($id = false)
     {
-        if (!$this->request->id) {
-            throw new Exception('Id not found');
+        if (!$this->request->id && !$id) {
+            throw new \Exception('Id not found');
+        }
+        if ($id) {
+            $this->request->id = $id;
         }
         $this->method = 'DELETE';
         $this->sendRequest();
         return $this->getResponse();
     }
 
+    /**
+     * 
+     * @return Uecommerce\Asaas\Response\Response
+     */
     public function all()
     {
         $this->method = 'GET';
@@ -132,10 +186,14 @@ class ApiClient extends AsaasAbstract
         return $this->getResponse();
     }
 
+    /**
+     * 
+     * @throws \Exception
+     */
     private function sendRequest()
     {
         if (!$this->request) {
-            throw new Exception('Object Request not set.');
+            throw new \Exception('Object Request not set.');
         }
 
         $curlSession = curl_init();
@@ -155,12 +213,28 @@ class ApiClient extends AsaasAbstract
 
     /**
      * 
-     * @return Response
+     * @return Uecommerce\Asaas\Response\Response
      */
     public function getResponse()
     {
-        print_r(json_decode($this->response));exit;
-        return new Response($this->response);
+        $response = new Response($this->response);
+        $dataResponse = $response->getData();
+        if (!count($dataResponse)) {
+            return false;
+        }
+        if (property_exists($dataResponse, 'id')) {
+            $this->request->setData(get_object_vars($dataResponse));
+        }
+        if (property_exists($dataResponse, 'object')) {
+            if ($dataResponse->object == 'list') {
+                if (count($dataResponse->data) == 1) {
+                    $array = get_object_vars($dataResponse->data[0]);
+                    $object = reset($array);
+                    $this->request->setData(get_object_vars($object));
+                }
+            }
+        }
+        return $response;
     }
 
     /**
@@ -173,12 +247,11 @@ class ApiClient extends AsaasAbstract
     {
 
         $data = $this->request->getData();
-
         $options = array
             (
             CURLOPT_FOLLOWLOCATION => true,
             CURLOPT_MAXREDIRS => 10,
-            CURLOPT_URL => $this->getApiUrl(),
+            CURLOPT_URL => $this->getApiUrlAndLimitOffset(),
             CURLOPT_HTTPHEADER => array
                 (
                 'Content-type: application/json',
@@ -189,6 +262,8 @@ class ApiClient extends AsaasAbstract
             CURLOPT_TIMEOUT => 10,
             CURLOPT_CUSTOMREQUEST => $this->method,
         );
+        
+//        print_r($options);
 
 //        if ($this->method == 'GET')
 //        {
@@ -202,5 +277,92 @@ class ApiClient extends AsaasAbstract
 
         return $options;
     }
+    
+    protected function getApiUrlAndLimitOffset()
+    {
+        $url = $this->getApiUrl();
+        $queryString = '';
+        if(strpos($url, '?') === false){
+            $queryString .= '?';
+        }
+        if($this->getLimit()){
+            $queryString .= 'limit='.$this->getLimit().'&';
+        }
+        if($this->getOffset())
+        {
+            $queryString .= 'offset='.$this->getOffset().'&';
+        }
+        
+        return $url.$queryString;
+    }
+
+    /**
+     * 
+     * @param array $filters
+     * @return \Uecommerce\Asaas\ApiClient
+     */
+    public function setFilters(array $filters)
+    {
+        $this->filters = $filters;
+        return $this;
+    }
+
+    /**
+     * 
+     * @return string
+     */
+    public function getFilters()
+    {
+        $filters = '';
+        if (count($this->filters)) {
+            $filters .= '?';
+            foreach ($this->filters as $filter => $value) {
+                $filters .= $filter . '=' . urlencode($value) . '&';
+            }
+        }
+        return $filters;
+    }
+    
+    /**
+     * 
+     * @param int $limit
+     * @return \Uecommerce\Asaas\ApiClient
+     */
+    public function setLimit($limit)
+    {
+        $this->limit = $limit;
+        return $this;
+    }
+    
+    /**
+     * 
+     * @return int
+     */
+    public function getLimit()
+    {
+        return $this->limit;
+    }
+    
+    /**
+     * 
+     * @param int $offset
+     * @return \Uecommerce\Asaas\ApiClient
+     */
+    public function setOffset($offset)
+    {
+        $this->offset = $offset;
+        return $this;
+    }
+    
+    /**
+     * 
+     * @return int
+     */
+    public function getOffset()
+    {
+        return $this->offset;
+    }
+    
+    
 
 }

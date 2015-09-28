@@ -21,7 +21,7 @@
  * @license    http://www.uecommerce.com.br/
  */
 
-namespace Uecommerce\Asaas\Request;
+namespace Uecommerce\Asaas\Request\Payment;
 
 use Uecommerce\Asaas\Request\RequestAbstract;
 use Uecommerce\Asaas\Contracts\Request;
@@ -35,7 +35,28 @@ use Uecommerce\Asaas\Contracts\Request;
  */
 class Payment extends RequestAbstract implements Request
 {
+    const BILLING_TYPE_BOLETO = 'BOLETO';
     
+    const BILLING_TYPE_CREDIT_CARD = 'CREDIT_CARD';
+    
+    const BILLING_TYPE_TRANSFER = 'TRANSFER';
+    
+    const BILLING_TYPE_DEPOSIT = 'DEPOSIT';
+    
+    //Aguardando pagamento
+    const STATUS_PENDING = 'PENDING';
+    
+    //Cobrança confirmada, porém com o saldo ainda não disponível. Válido somente para cartão de crédito.
+    const STATUS_CONFIRMED = 'CONFIRMED';
+    
+    //Cobrança paga
+    const STATUS_RECEIVED = 'RECEIVED';
+    
+    //Cobrança atrasada
+    const STATUS_OVERDUE = 'OVERDUE';
+    
+    
+    public $object;
     
     public $id;
     
@@ -104,6 +125,10 @@ class Payment extends RequestAbstract implements Request
     public $creditCardHolderMobilePhone;
     
     public $creditCardHolderMobilePhoneDDD;
+    
+    public $paymentDate;
+    
+    public $deleted;
     
     
     /**

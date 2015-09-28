@@ -38,4 +38,6 @@ interface Request
      * @return string uri
      */
     public function getUri();
+    
+    
 }

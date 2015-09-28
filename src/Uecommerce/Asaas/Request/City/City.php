@@ -21,8 +21,9 @@
  * @license    http://www.uecommerce.com.br/
  */
 
-namespace Uecommerce\Asaas;
-
+namespace Uecommerce\Asaas\Request\City;
+use Uecommerce\Asaas\Request\RequestAbstract;
+use Uecommerce\Asaas\Contracts\Request;
 
 /**
  * Asaas
@@ -31,46 +32,24 @@ namespace Uecommerce\Asaas;
  * @package    Uecommerce_Asaas
  * @author     Uecommerce Dev Team
  */
-
-abstract class AsaasAbstract
+class City extends RequestAbstract implements Request
 {
-    /**
-     *
-     * @var string
-     */
-    private $apikey;
+    
+    public $id;
+    
+    public $ibgeCode;
+    
+    public $name;
+    
+    public $districtCode;
+    
+    public $district;
+    
+    public $state;
     
     
-    const ASAAS_API_URL = 'https://www.asaas.com/api/';
-    
-    const ASAAS_API_VERSION = 'v2';
-    
-    /**
-     * 
-     * @param string $apikey
-     */
-    public function setApiKey($apikey)
+    public function getUri()
     {
-        $this->apikey = $apikey;
+        return 'cities';
     }
-    
-    /**
-     * 
-     * @return string
-     */
-    public function getApiKey()
-    {
-        return $this->apikey;
-    }
-    
-    /**
-     * 
-     * @return string
-     */
-    public function getApiUrl()
-    {
-        return self::ASAAS_API_URL.self::ASAAS_API_VERSION.'/';
-    }
-    
-    
 }

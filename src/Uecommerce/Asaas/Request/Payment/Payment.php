@@ -127,6 +127,8 @@ class Payment extends RequestAbstract implements Request
     public $creditCardHolderMobilePhoneDDD;
     
     public $paymentDate;
+
+    public $invoiceNumber;
     
     public $deleted;
     

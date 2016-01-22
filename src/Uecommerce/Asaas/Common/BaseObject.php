@@ -59,6 +59,9 @@ abstract class BaseObject
         $refl = new \ReflectionClass($this);
         
         foreach($data as $propertyToSet => $value){
+            if(!property_exists($this, $propertyToSet)) {
+                continue;
+            }
             $property = $refl->getProperty($propertyToSet);
             
             if($property instanceof \ReflectionProperty){

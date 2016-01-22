@@ -202,11 +202,20 @@ class ApiClient extends AsaasAbstract
 
         $responseBody = curl_exec($curlSession);
 
-        curl_close($curlSession);
-
         if (!$responseBody) {
-            throw new \Exception("Error Processing Request", 1);
+            $message = 'Empty Response: '.$responseBody;
+
+            if(curl_errno($curlSession)) {
+                $message = curl_error($curlSession);
+            }
+
+            $message .= ' -  Curl Options:';
+            $message .= print_r($this->getOptions(), 1);
+
+            throw new \Exception($message);
         }
+
+        curl_close($curlSession);
 
         $this->response = $responseBody;
     }

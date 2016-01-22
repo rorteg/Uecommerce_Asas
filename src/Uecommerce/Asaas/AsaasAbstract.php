@@ -39,11 +39,21 @@ abstract class AsaasAbstract
      * @var string
      */
     private $apikey;
+
+    /**
+     *
+     * @var string
+     */
+    private $apiUrl;
     
-    
-    const ASAAS_API_URL = 'https://www.asaas.com/api/';
-    
-    const ASAAS_API_VERSION = 'v2';
+    /**
+     *
+     * construct
+     */
+    public function __construct() 
+    {
+        $this->apiUrl = 'https://www.asaas.com/api/v2/';
+    }
     
     /**
      * 
@@ -52,6 +62,7 @@ abstract class AsaasAbstract
     public function setApiKey($apikey)
     {
         $this->apikey = $apikey;
+        return $this;
     }
     
     /**
@@ -69,7 +80,16 @@ abstract class AsaasAbstract
      */
     public function getApiUrl()
     {
-        return self::ASAAS_API_URL.self::ASAAS_API_VERSION.'/';
+        return $this->apiUrl;
+    }
+
+    /**
+    *
+    * @param string $url
+    */
+    public function setApiUrl($url) {
+        $this->apiUrl = $url;
+        return $this;
     }
     
     

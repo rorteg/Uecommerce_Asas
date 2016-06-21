@@ -268,7 +268,7 @@ class ApiClient extends AsaasAbstract
                 'access_token: ' . $this->getApiKey()
             ),
             CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_TIMEOUT => 10,
+            CURLOPT_TIMEOUT => 50,
             CURLOPT_CUSTOMREQUEST => $this->method,
         );
         
